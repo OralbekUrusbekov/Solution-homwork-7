@@ -1,5 +1,7 @@
 import Part1.*;
 
+import java.util.*;
+
 public class Main {
     public static void main(String[] args) {
         // Create episodes
@@ -21,33 +23,25 @@ public class Main {
         series.addSeason(season1);
         series.addSeason(season2);
 
-        System.out.println("Normal Iterator:");
-        EpisodeIterator normal = new SeasonIterator(season1);
-        while (normal.hasNext()) {
-            System.out.println(normal.next());
-        }
-
-        System.out.println("\nReverse Iterator:");
-        EpisodeIterator reverse = new ReverseSeasonIterator(season1);
-        while (reverse.hasNext()) {
-            System.out.println(reverse.next());
-        }
-
-        System.out.println("\nShuffle Iterator (seed = 42):");
-        EpisodeIterator shuffle = new ShuffleSeasonIterator(season1, 42);
-        while (shuffle.hasNext()) {
-            System.out.println(shuffle.next());
-        }
-
-        System.out.println("\nSeason with for-each:");
-        for (Episode ep : season1) {
-            System.out.println(ep);
-        }
-
-        System.out.println("\nBinge Iterator:");
+        // Skip Intro
+        System.out.println("\nSkip Intro Iterator (skip 90s):");
         EpisodeIterator binge = new BingeIterator(series);
-        while (binge.hasNext()) {
-            System.out.println(binge.next());
+        SkipIntroIterator skipIntro = new SkipIntroIterator(binge, 90);
+        while (skipIntro.hasNext()) {
+            EpisodeView view = skipIntro.next();
+            view.play(); // starts from 90s
+        }
+
+        // Watch History Filter
+        System.out.println("\nWatch History Filter (watched: 'Pilot'):");
+        Set<String> watched = new HashSet<>();
+        watched.add("Pilot");
+
+        EpisodeIterator season1Iterator = new SeasonIterator(season1);
+        WatchHistoryFilterIterator unseenIterator = new WatchHistoryFilterIterator(season1Iterator, watched);
+
+        while (unseenIterator.hasNext()) {
+            System.out.println("Unseen: " + unseenIterator.next().getTitle());
         }
     }
 }
