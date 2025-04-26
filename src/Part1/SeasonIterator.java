@@ -1,4 +1,6 @@
 package Part1;
+import java.util.Iterator;
+import java.util.List;
 
 public class SeasonIterator implements EpisodeIterator, Iterator<Episode> {
     private List<Episode> episodes;
