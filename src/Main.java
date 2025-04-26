@@ -1,9 +1,16 @@
 import Part1.*;
+import Part2.*;
 
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 
 public class Main {
     public static void main(String[] args) {
+        // Iterator Pattern Test
+        System.out.println("    Iterator Pattern Test   ");
         // Create episodes
         Episode e1 = new Episode("Pilot", 1800);
         Episode e2 = new Episode("Second Wind", 1900);
@@ -43,5 +50,54 @@ public class Main {
         while (unseenIterator.hasNext()) {
             System.out.println("Unseen: " + unseenIterator.next().getTitle());
         }
+
+
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        // Iterator Pattern Test
+        System.out.println("    Mediator Pattern Test   ");
+        ControlTower tower = new ControlTower();
+        Random rand = new Random();
+
+        List<Aircraft> aircrafts = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            Aircraft a;
+            int type = rand.nextInt(3);
+            String id = "A" + i;
+
+            switch (type) {
+                case 0 -> a = new PassengerPlane(id);
+                case 1 -> a = new CargoPlane(id);
+                default -> a = new Helicopter(id);
+            }
+
+            tower.registerAircraft(a);
+            aircrafts.add(a);
+        }
+
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleAtFixedRate(() -> {
+            Aircraft a = aircrafts.get(rand.nextInt(aircrafts.size()));
+            int chance = rand.nextInt(10);
+            if (chance < 2) {
+                a.send("MAYDAY", tower); // Emergency
+            } else {
+                if (tower.requestRunway(a)) {
+                    a.receive("Landing successful.");
+                    tower.releaseRunway();
+                }
+            }
+
+            tower.processQueues();
+        }, 0, 1, TimeUnit.SECONDS);
+
+        // Auto shutdown after 20 seconds
+        scheduler.schedule(() -> {
+            scheduler.shutdown();
+            System.out.println("\nSimulation ended.");
+        }, 20, TimeUnit.SECONDS);
     }
-}
+
+    }
+
