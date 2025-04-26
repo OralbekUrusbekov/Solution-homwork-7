@@ -2,16 +2,23 @@ package Part1;
 
 import java.util.Set;
 
+/**
+  WatchHistoryFilterIterator filters out episodes that have already been watched
+  and only yields unwatched episodes from the base iterator.
+ */
+
 public class WatchHistoryFilterIterator implements EpisodeIterator {
     private EpisodeIterator baseIterator;
     private Set<String> watchedTitles;
     private Episode nextUnwatched;
+
 
     public WatchHistoryFilterIterator(EpisodeIterator baseIterator, Set<String> watchedTitles) {
         this.baseIterator = baseIterator;
         this.watchedTitles = watchedTitles;
         advance();
     }
+
 
     private void advance() {
         nextUnwatched = null;
@@ -24,10 +31,12 @@ public class WatchHistoryFilterIterator implements EpisodeIterator {
         }
     }
 
+
     @Override
     public boolean hasNext() {
         return nextUnwatched != null;
     }
+
 
     @Override
     public Episode next() {
